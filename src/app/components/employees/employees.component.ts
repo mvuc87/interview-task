@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { combineLatest, debounceTime, map, startWith } from 'rxjs';
+import { combineLatest, debounceTime, map } from 'rxjs';
 import { Employee } from '../../services/employee.model';
 import { EmployeeService } from '../../services/employees.service';
 import { SearchService } from '../../services/search.service';
@@ -19,16 +19,13 @@ export class EmployeesComponent implements OnInit {
 
   ngOnInit(): void {
     combineLatest([
-      this.searchService.text.pipe(
-        debounceTime(500), // we don't really want to update table as some is typing fast
-        startWith('') // initially do not wait for 500ms before showing table results
-      ),
+      this.searchService.text.pipe(debounceTime(200)),
       this.employeeService.all,
     ]).pipe(
       map(([searchText, employees]) => {
         if (searchText) {
           const search = searchText.toLowerCase();
-          return employees.filter(({ name, email }) => name.toLowerCase().includes(search) || email.includes(search));
+          return employees.filter(({ name, email }) => name.toLowerCase().includes(search) || email.toLowerCase().includes(search));
         } else {
           return employees;
         }
@@ -36,17 +33,5 @@ export class EmployeesComponent implements OnInit {
     ).subscribe((employees) => {
       this.employees = employees;
     });
-  }
-
-  /**
-   * @returns `true` if `employee` has active shift, `false` otherwise
-   */
-  hasActiveShift(employee: Employee) {
-    for (const shift of employee.shifts) {
-      if (shift.clockOut === '0') {
-        return true;
-      }
-    }
-    return false;
   }
 }
