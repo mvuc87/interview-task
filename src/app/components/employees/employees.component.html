@@ -1,14 +1,24 @@
 <table>
   <tr>
-    <td>ID</td>
-    <td>Name</td>
-    <td>Email</td>
-    <td>Sum of daily earnings</td>
+    <td class="bold">ID</td>
+    <td class="bold">Name</td>
+    <td class="bold">Email</td>
+    <td></td>
+    <td class="bold day" *ngFor="let dayNumber of days">Day {{ dayNumber }}</td>
   </tr>
   <tr *ngFor="let employee of employees">
     <td>{{ employee.id }}</td>
     <td>{{ employee.name }}</td>
     <td>{{ employee.email }}</td>
-    <td>{{ employee | sumOfDailyEarnings }}</td>
+    <td>
+      <button *ngIf="hasActiveShift(employee) else ClockIn">Clock Out</button>
+    </td>
+    <td *ngFor="let shift of employee.shifts">
+      {{ earnings(employee.hourlyRate, shift) }}
+    </td>
   </tr>
 </table>
+
+<ng-template #ClockIn>
+  <button>Clock In</button>
+</ng-template>

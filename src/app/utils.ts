@@ -1,10 +1,12 @@
-import { Pipe, PipeTransform } from '@angular/core';
-import { Employee, Shift } from '../services/employee.model';
+import { Shift } from './services/employee.model';
 
 const MINUTES_IN_A_DAY = 24 * 60;
 
-function isShiftActive(shift: Shift) {
-  return shift.clockOut === '0';
+/**
+ * @returns `true` if a shift is active, `false` otherwise
+ */
+export function isShiftActive(shift: Shift) {
+  return shift.clockOut === '0' || shift.clockOut === '';
 }
 
 /**
@@ -14,7 +16,7 @@ function toMinutes([hours, minutes]: [number, number]) {
   return hours * 60 + minutes;
 }
 
-function durationInHours(shift: Shift) {
+export function durationInHours(shift: Shift) {
   if (isShiftActive(shift)) {
     return 0;
   } else {
@@ -41,16 +43,5 @@ function durationInHours(shift: Shift) {
       const totalHours = (start + end) / 60;
       return totalHours;
     }
-  }
-}
-
-@Pipe({name: 'sumOfDailyEarnings'})
-export class SumOfDailyEarningsPipe implements PipeTransform {
-  transform(employee: Employee): number {
-    const dailyEarnings = employee.shifts
-      .filter(shift => shift.clockIn.length && shift.clockOut.length) // filter out invalud shifts (e.g. clockOut: "")
-      .map(shift => durationInHours(shift) * employee.hourlyRate);
-    const sumOfDailyEarnings = dailyEarnings.reduce((acc, value) => acc + value);
-    return sumOfDailyEarnings;
   }
 }

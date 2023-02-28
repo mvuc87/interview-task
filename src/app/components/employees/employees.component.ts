@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { combineLatest, debounceTime, map } from 'rxjs';
-import { Employee } from '../../services/employee.model';
+import { Employee, Shift } from '../../services/employee.model';
 import { EmployeeService } from '../../services/employees.service';
 import { SearchService } from '../../services/search.service';
+import { durationInHours, isShiftActive } from '../../utils';
 
 @Component({
   selector: 'app-employees',
@@ -16,6 +17,13 @@ export class EmployeesComponent implements OnInit {
     private employeeService: EmployeeService,
     private searchService: SearchService
   ) { }
+
+  get days(): number[] {
+    const maxDays = this.employees
+      .map(({ shifts }) => shifts.length)
+      .reduce((acc, value) => acc >= value ? acc : value, 0);
+    return new Array(maxDays).fill(0).map((_, index) => index + 1);
+  }
 
   ngOnInit(): void {
     combineLatest([
@@ -33,5 +41,21 @@ export class EmployeesComponent implements OnInit {
     ).subscribe((employees) => {
       this.employees = employees;
     });
+  }
+
+  earnings(hourlyRate: number, shift: Shift) {
+    return Math.floor(hourlyRate * durationInHours(shift));
+  }
+
+  /**
+   * @returns `true` if there is active shift for employee, `false` otherwise
+   */
+  hasActiveShift({ shifts }: Employee) {
+    for (const shift of shifts) {
+      if (isShiftActive(shift)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
