@@ -32,12 +32,20 @@ function createWindow(): BrowserWindow {
     win.webContents.send("READ_EMPLOYEES_SHIFTS", parsed);
   });
 
+  ipcMain.on("SAVE_EMPLOYEES_SHIFTS", (ev, shifts) => {
+    try {
+      console.log("SAVING DATA");
+      fs.writeFileSync("./data/employee-shifts.json", JSON.stringify(shifts, null, 4));
+    } catch(err) {
+      console.log("Error occured while update contents of file: 'employee-shifts.json'. " + JSON.stringify(err));
+    }
+  });
+
   return win;
 }
 
 app.whenReady().then(() => {
   createWindow();
-
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   })

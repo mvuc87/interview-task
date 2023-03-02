@@ -28,7 +28,7 @@ export class EmployeesComponent implements OnInit {
   ngOnInit(): void {
     combineLatest([
       this.searchService.text.pipe(debounceTime(200)),
-      this.employeeService.all,
+      this.employeeService.all(),
     ]).pipe(
       map(([searchText, employees]) => {
         if (searchText) {
@@ -43,8 +43,11 @@ export class EmployeesComponent implements OnInit {
     });
   }
 
+  /**
+   * @returns daily earnings
+   */
   earnings(hourlyRate: number, shift: Shift) {
-    return Math.floor(hourlyRate * durationInHours(shift));
+    return Math.round(hourlyRate * durationInHours(shift) * 100) / 100;
   }
 
   /**
@@ -57,5 +60,13 @@ export class EmployeesComponent implements OnInit {
       }
     }
     return false;
+  }
+
+  onClockOut() {
+    this.employeeService.clockOut();
+  }
+
+  onClockIn(employee: Employee) {
+    this.employeeService.clockIn(employee);
   }
 }

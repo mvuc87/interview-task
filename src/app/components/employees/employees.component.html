@@ -3,14 +3,20 @@
     <td class="bold">ID</td>
     <td class="bold">Name</td>
     <td class="bold">Email</td>
-    <td class="bold day" *ngFor="let dayNumber of days">Day {{ dayNumber }}</td>
+    <td></td>
+    <td class="bold day" *ngFor="let dayNumber of days">Shift {{ dayNumber }}</td>
   </tr>
   <tr *ngFor="let employee of employees">
     <td>{{ employee.id }}</td>
     <td>{{ employee.name }}</td>
     <td>{{ employee.email }}</td>
+    <td>
+      <button *ngIf="hasActiveShift(employee)" (click)="onClockOut()">Clock Out</button>
+      <button *ngIf="!hasActiveShift(employee)" (click)="onClockIn(employee)">Clock In</button>
+    </td>
     <td *ngFor="let shift of employee.shifts">
-      {{ earnings(employee.hourlyRate, shift) }}
+      <div *ngIf="shift.clockOut === '0'">Active</div>
+      <div *ngIf="shift.clockOut !== '0'">{{ earnings(employee.hourlyRate, shift) }}</div>
     </td>
   </tr>
 </table>

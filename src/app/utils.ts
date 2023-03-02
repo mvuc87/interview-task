@@ -6,7 +6,7 @@ const MINUTES_IN_A_DAY = 24 * 60;
  * @returns `true` if a shift is active, `false` otherwise
  */
 export function isShiftActive(shift: Shift) {
-  return shift.clockOut === '0' || shift.clockOut === '';
+  return shift.clockOut === '0';
 }
 
 /**
@@ -16,6 +16,9 @@ function toMinutes([hours, minutes]: [number, number]) {
   return hours * 60 + minutes;
 }
 
+/**
+ * @returns a duration of a shift expressiod in hours. Could be decimal.
+ */
 export function durationInHours(shift: Shift) {
   if (isShiftActive(shift)) {
     return 0;
